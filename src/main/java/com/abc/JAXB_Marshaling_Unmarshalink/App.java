@@ -1,5 +1,7 @@
 package com.abc.JAXB_Marshaling_Unmarshalink;
 
+import org.eclipse.persistence.jaxb.UnmarshallerProperties;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringReader;
@@ -17,8 +19,9 @@ public class App
         Student employee = new Student (1, "Lokesh", "Gupta", new Department(101, "IT"));
 
         employee.setHobbies(Arrays.asList("Swimming","Playing", "Karate"));
-
+        String jsonString = "{\"employee\":{\"department\":{\"id\":101,\"name\":\"IT\"},\"firstName\":\"Lokesh\",\"id\":1,\"lastName\":\"Gupta\"}}";
         jaxbObjectToXML(employee);
+        jaxbJsonStringToObject(jsonString);
     }
 
     private static void jaxbObjectToXML( Student employee)
@@ -51,6 +54,27 @@ public class App
             Student student = (Student) jaxbUnmarshaller.unmarshal(new StringReader (unmarshal));
             System.out.println (student );
         } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+    private static void jaxbJsonStringToObject(String jsonString)
+    {
+        JAXBContext jaxbContext;
+        try
+        {
+            jaxbContext = JAXBContext.newInstance(Student.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+            //Set JSON type
+            jaxbUnmarshaller.setProperty( UnmarshallerProperties.MEDIA_TYPE, "application/json");
+            jaxbUnmarshaller.setProperty(UnmarshallerProperties.JSON_INCLUDE_ROOT, true);
+
+            Student employee = (Student) jaxbUnmarshaller.unmarshal(new StringReader(jsonString));
+
+            System.out.println(employee);
+        }
+        catch (JAXBException e)
+        {
             e.printStackTrace();
         }
     }
